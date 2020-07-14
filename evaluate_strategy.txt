@@ -1,0 +1,214 @@
+reset;
+
+option randseed''; #'1860048692';
+
+# SOLVER MISSING HERE
+option solver "";
+
+param fein := 1;
+
+
+param maxp1 := 50;
+param maxp2 :=  20;
+param maxp3 :=  20;
+
+set A := union {i in      fein/fein    ..maxp1/fein}   {round(i*fein,5)};     # Preismenge 
+#   union union {i in  maxp1/fein/10 ..maxp2/fein/10}  {round(i*fein*10 -fein,5)}  
+#   union union {i in  maxp2/fein/100..maxp3/fein/100} {round(i*fein*100-fein,5)};  
+
+
+########################################################################
+##########  Zufaellige Kokurrenzsituation / Anwendungsfall   ###########
+########################################################################
+						
+
+param platz_{a in A,p in A} := 1+( (if p < a then 1)   # unser Platz bei Preis p
+                                +  (if p <=a+fein/10 then 1))/2; # display platz_; end;
+
+
+param diff1_{a in A,p in A} := a-p;        # unser Preisabstand zum billigsten Konkurrenten
+
+param ncomp_{a in A,p in A} := 1;
+param niveau_{a in A,p in A}:= (a+p)/2;
+
+ 
+########################################################################
+#############             Verkaufsw'keiten            ##################
+########################################################################
+
+
+param c1_ := -3.89; #-3.89
+param c2_ := -0.56;
+param c3_ := -0.01;
+param c4_ :=  0.07;
+param c5_ := -0.03;
+
+
+#param N := 1;		# Bestand
+
+param T := 100;		# Anzahl Iterationen
+
+param n := 8;		# m�gliche Verk�ufe pro Periode
+
+param delta := 0.9;
+               #round(Uniform(0.9,1),3); #0.99*1/(1+2/100/12/30/24*2);  # Diskontfaktor (Periode=2h)
+
+param L  := 0.0000; #0.01/24*2;   # Lagerkosten  (0.1 cent/Tag)
+
+param c := 0; #fein;		# Versandkosten
+
+#param K:=10;
+
+param h default 0.5;
+
+
+
+param lam{a in A,p in A} := if p>0 then
+
+800*  (    exp(c1_+c2_*platz_[a,p]+c3_*diff1_[a,p]+c4_*ncomp_[a,p]+c5_*niveau_[a,p])
+      /( 1+exp(c1_+c2_*platz_[a,p]+c3_*diff1_[a,p]+c4_*ncomp_[a,p]+c5_*niveau_[a,p]) ) ) /n;     # Logit Verkaufsw'keiten pro 1/n Periode
+
+
+param bk   {nn in 0..50,k in 0..nn} := if k=0 or k=nn then 1 else bk[nn-1,k] + bk[nn-1,k-1];	# Binomialkoeffizienten
+												
+
+param bin {k in 0..n,a in A,p in A} := if k<=n then bk[n,k] * (lam[a,p]/2   )^k  * (1-lam[a,p]/   2)^(n-k);          # Binomialw'keiten
+				   								# if k=1 then lam[a,p] else (1-lam[a,p]);  			# wenn n=1
+
+
+				
+########################################################################
+#######   V = value iteration sticky  fuer geg. aktuelle Preise  #######
+########################################################################
+
+		 	 
+##################################
+#######   Gegnerstrategie  #######
+##################################
+
+#### deterministische Strategien
+
+param F1{a in A} default round(max(a-fein,1),5);              # immer unterbieten
+#param F1{a in A} default 20;              # fixpreis
+
+#param F1{a in A} default if a-fein>=5 then min(a-fein,50) else 40;  # two bound (5,40)
+#param F1{a in A} default if a-fein>=25 then min(a-fein,50) else 45;  # two bound (25,45)
+#param F1{a in A} default if a == 33 then 33 else round(max(a-fein,1),5);              # immer unterbieten
+#param F1{a in A} default if a == 33 then 33 else if a-fein>=10 then min(a-fein, 20) else 20;  # Cartel low level
+
+
+#### gemischte Strategien (F1 F2 F3)
+
+param F2{a in A} default round(max(a-3*fein,1),5);
+param F3{a in A} default round(min(a+5*fein,maxp1),5);
+
+param F4{a in A} default if a-fein>=20 then min(a-fein,50) else 40;  # two bound (20,40)
+param pmix1 := 1/2;                # probability F1 zu spielen
+param pmix2 := 1/2;                # probability F2 zu spielen
+param pmix3 := 1- pmix1 - pmix2;   # probability F3 zu spielen
+
+
+#### stark randomisierte Strategien
+
+param sim := 10000;   # Anzahl simulierte Reaktionen pro Preis a
+
+#param FR{a in A,i in 1..sim} := min(maxp1,max(0,round(F3[a] + Uniform(-5,5)/fein)*fein));
+param FR{a in A,i in 1..sim} := min(maxp1,max(0,round(F1[a] + Normal(0,2)/fein)*fein));
+
+param UMrandom{a in A,f in A} := 1/sim * sum{i in 1..sim:f=FR[a,i]} 1;
+param UMrandomrange{f in A} := if (10 <= f and f < 50) then (1/40) else 0;
+
+
+##### Definition der Preisuebergangsw'keiten fuer das DP
+
+param kk := 1;  # hier 1, 2, oder 3 setzen fuer gewuenschte Gegnerstrategie
+
+param UM{a in A,f in A} :=  if kk=1 then (if f=F1[a] then 1 else 0)   # kk=1 deterministisch F1
+                       else if kk=2 then ((if f=F4[a] then pmix1)       # kk=2 F1/F2/F3 mix
+					                    + (UMrandomrange[f] * (1 - pmix1)))
+					   else if kk=3 then UMrandom[a,f]
+					   else if kk=4 then UMrandomrange[f];               # kk=3 random strategy
+
+param UMtest{a in A} := sum{f in A} UM[a,f];
+
+display UM;
+display UMtest;  # Zeilensumme immer = 1?
+
+
+#############################
+
+param dl ;	# zB 3
+param epi;	# zB 99000
+param chunk;# zB 1000
+
+set J:= chunk..epi by chunk;
+
+
+param input {1..epi/chunk*dl,1..2+card(A)};
+
+
+data;
+
+include /Users/ak/workspace/reinpricing/input.txt;
+
+model;
+
+display epi, dl, chunk; #end;
+display input;
+
+param strat{i in 1..dl,j in J,k in A} :=input[(i-1)*epi/chunk+j/chunk,k+2];
+
+#param strat{i in 1..3,j in 1000..99000 by 1000,k in 1..50}
+#:=input[(i-1)*99+j/1000,k+2];
+
+display strat; #end;
+
+###################  L�sung analytisch per LP  ##############################	
+
+param dl2;
+param epi2;
+
+param ve {i in 1..dl,j in J,p in A} default 0;
+
+
+var value {p in A} := p;
+
+subject to nbe {p in A}:     value[p] = max {a in A:a=max(1,min(50,floor(strat[dl2,epi2,p])))}  ( sum {i1 in 0..n,i2 in 0..n,f in A:UM[a,f]>0} bin[i1,a,p] * UM[a,f] * bin[i2,a,f] 
+                                 * ( (i1+i2)*(a-c) + delta * value[f]) );
+
+for{i in 1..dl,j in J} {let dl2:=i; let epi2:=j;
+solve; for {p in A} let ve[i,j,p] := value[p];};
+
+
+display ve;
+#display ve,pe > sol_5-40_out.txt;
+
+display _ampl_time > learning_curve_out.txt;
+printf"epi  V[1,30]  V[2,30]  V[3,30]\n" >> learning_curve_out.txt;
+
+for{j in J} {
+#printf"%2i %6.3f  %6.3f %6.3f\n", j, ve[1,j,30],ve[2,j,30],ve[3,j,30];
+printf"%2i ", j;
+for {i in 1..dl} printf"%6.3f  ", ve[i,j,30];
+printf"\n";
+#printf"%2i %6.3f  %6.3f %6.3f\n", j, ve[1,j,30],ve[2,j,30],ve[3,j,30] >> learning_curve_out.txt;
+printf"%2i ", j >> learning_curve_out.txt;
+for {i in 1..dl} printf"%6.3f  ", ve[i,j,30] >> learning_curve_out.txt;
+printf"\n" >> learning_curve_out.txt;
+                                };
+
+drop nbe;
+
+subject to nbe2 {p in A}:     value[p] = max {a in A}  ( sum {i1 in 0..n,i2 in 0..n,f in A:UM[a,f]>0} bin[i1,a,p] * UM[a,f] * bin[i2,a,f] 
+                                 * ( (i1+i2)*(a-c) + delta * value[f]) );
+
+solve;
+
+display value[30];
+printf"\nV[30] optimal: %5.3f", value[30] >> learning_curve_out.txt;
+
+end;
+
+		
+
+

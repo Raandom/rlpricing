@@ -1,0 +1,29 @@
+{
+  "gym_params": {
+    "min_p": 1,
+    "max_p": 50,
+    "h": 0.5,
+    "w": 0.9,
+    "step_size": 1.0,
+    "sim_params": {
+      "params": [-3.89, -0.56, -0.01, 0.07, -0.03, 0],
+      "factor": 800
+    },
+    "mode": "continuous",
+    "mode_b": "continuous"
+  },
+  "model": "sac",
+  "model_b": "sac",
+  "train_timesteps": 50000,
+  "train_epochs": 10,
+  "eval_timesteps": 20000,
+  "model_params": {
+    "tensorboard_log": "./summarydir",
+    "policy_kwargs": {
+      "layers": [128, 128, 128]
+    },
+    "random_exploration": 0.2
+  },
+  "num_experiments": 1,
+  "plot_strats": true
+}

@@ -1,0 +1,28 @@
+{
+  "gym_params": {
+    "min_p": 1,
+    "max_p": 50,
+    "h": 0.5,
+    "w": 0.9,
+    "mode": "continuous",
+    "step_size": 1.0,
+    "competitor": "twobound",
+    "comp_params": {
+      "min_p": 1,
+      "max_p": 50,
+      "diff": 1
+    },
+    "sim_params": {
+      "params": [-3.89, -0.56, -0.01, 0.07, -0.03, 0],
+      "factor": 800
+    }
+  },
+  "train_timesteps": 500000,
+  "eval_timesteps": 20000,
+  "model_params": {
+    "gamma": 0.9
+  },
+  "num_experiments": 10,
+  "plot_strats": true,
+  "gym_type": "duopoly"
+}

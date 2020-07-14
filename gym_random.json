@@ -1,0 +1,9 @@
+{
+  "gym_params": {
+    "competitor": "random",
+    "comp_params": {
+      "min_p": 10,
+      "max_p": 50
+    }
+  }
+}

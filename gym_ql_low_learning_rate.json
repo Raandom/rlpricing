@@ -1,0 +1,10 @@
+{
+  "model_params": {
+    "network_params": {
+      "optimizer_args": {
+        "lr": 0.0005
+      }
+    },
+    "sample_size": 512
+  }
+}

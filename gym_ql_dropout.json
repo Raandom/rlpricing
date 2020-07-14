@@ -1,0 +1,7 @@
+{
+  "model_params": {
+    "network_params": {
+      "use_dropout": true
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "model_params": {
+    "network_params": {
+      "hidden_structure": [
+        {
+            "units": 128,
+            "activation": "relu",
+            "use_bias": true,
+            "kernel_initializer": "glorot_normal",
+            "bias_initializer": "glorot_normal"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model_params": {
+    "policy_kwargs": {
+      "layers": [128, 128, 128]
+    },
+    "random_exploration": 0.2
+  },
+  "train_timesteps": 500000,
+  "model": "sac",
+  "num_experiments": 5,
+  "plot_strats": true
+}

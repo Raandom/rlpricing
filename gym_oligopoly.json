@@ -1,0 +1,52 @@
+{
+  "gym_type": "oligopoly",
+  "gym_params": {
+    "agent_intervall": 1.0,
+    "time_stddev": 0.2,
+    "comp_params": [
+      {
+        "type": "twobound",
+        "min_p": 1,
+        "max_p": 50,
+        "diff": 1,
+        "intervall": 0.7
+      },
+      {
+        "type": "twobound",
+        "min_p": 15,
+        "max_p": 45,
+        "diff": 1,
+        "intervall": 1.2
+      },
+      {
+        "type": "fixed",
+        "p": 19,
+        "intervall": 1.1
+      },
+      {
+        "type": "random",
+        "min_p": 1,
+        "max_p": 50,
+        "intervall": 0.6
+      },
+      {
+        "type": "mixedrandom",
+        "strats":[
+          ["twobound", {"min_p": 20, "max_p": 40, "diff": 1}],
+          ["random", {"min_p":  10, "max_p": 50}]
+        ],
+        "p": [
+          0.5,
+          0.5
+        ],
+        "intervall": 1.6
+      }
+    ],
+    "sim_params": {
+      "price_factors": null,
+      "biases": null,
+      "cus_stddev": 2,
+      "customer_arrival_time": 0.1
+    }
+  }
+}

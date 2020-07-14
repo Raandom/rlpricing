@@ -1,0 +1,8 @@
+{
+  "gym_params": {
+    "mode": "discrete_relative"
+  },
+  "model_params": {
+    "use_relative": true
+  }
+}

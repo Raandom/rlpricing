@@ -1,0 +1,8 @@
+{
+  "model_params": {
+    "network_params": {
+      "reg_target": "kernel",
+      "reg_method": "l1"
+    }
+  }
+}

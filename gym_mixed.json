@@ -1,0 +1,15 @@
+{
+  "gym_params": {
+    "competitor": "mixedrandom",
+    "comp_params": {
+      "strats":[
+        ["twobound", {"min_p": 20, "max_p": 40, "diff": 1}],
+        ["random", {"min_p":  10, "max_p": 50}]
+      ],
+      "p": [
+        0.5,
+        0.5
+      ]
+    }
+  }
+}

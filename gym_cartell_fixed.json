@@ -1,0 +1,12 @@
+{
+  "gym_params": {
+    "competitor": "cartel",
+    "comp_params": {
+      "min_p": 10,
+      "max_p": 20,
+      "hard_upper_limit": true,
+      "cartel_p": 33,
+      "diff": 1
+    }
+  }
+}

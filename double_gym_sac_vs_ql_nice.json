@@ -1,0 +1,40 @@
+{
+  "gym_params": {
+    "mode_b": "discrete"
+  },
+  "model_b": "ql",
+  "model_b_params": {
+    "use_double": true,
+    "sample_size": 512,
+    "network_params": {
+      "optimizer_args": {
+        "lr": 0.0005
+      },
+      "hidden_structure": [
+        {
+            "units": 128,
+            "activation": "relu",
+            "use_bias": true,
+            "kernel_initializer": "glorot_normal",
+            "bias_initializer": "glorot_normal"
+        }
+      ],
+      "dueling_hidden_layers": [
+        {
+            "units": 128,
+            "activation": "relu",
+            "use_bias": true,
+            "kernel_initializer": "glorot_normal",
+            "bias_initializer": "glorot_normal"
+        }
+      ],
+      "use_dueling": true
+    },
+    "eps": 1.0,
+    "decay": 0.999,
+    "min_eps": 0.2,
+    "store_params": {
+      "size": 16384
+    }
+  }
+}

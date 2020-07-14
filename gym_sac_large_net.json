@@ -1,0 +1,7 @@
+{
+  "model_params": {
+    "policy_kwargs": {
+      "layers": [256, 256, 256]
+    }
+  }
+}

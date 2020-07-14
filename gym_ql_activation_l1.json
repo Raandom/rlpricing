@@ -1,0 +1,8 @@
+{
+  "model_params": {
+    "network_params": {
+      "reg_target": "activation",
+      "reg_method": "l1"
+    }
+  }
+}

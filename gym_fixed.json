@@ -1,0 +1,8 @@
+{
+  "gym_params": {
+    "competitor": "fixed",
+    "comp_params": {
+      "p": 20
+    }
+  }
+}
